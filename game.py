@@ -47,10 +47,10 @@ class Game():
         elif decision == DECLINE:
             player.remove_token()
             self._chips_on_card += 1
+            # Advance to next player only iff they decline the card
+            self._current_player = (self._current_player + 1) % len(self._players)
         else:
             raise Exception("Unknown player decision {}", decision)
-
-        self._current_player = (self._current_player + 1) % len(self._players)
 
         if self.verbose:
             self._print_state()
