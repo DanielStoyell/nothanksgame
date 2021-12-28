@@ -4,9 +4,10 @@ from constants import *
 class PlayerBase():
     NAME = None
 
-    def __init__(self):
+    def __init__(self, suffix=''):
         self.__chips = 11
         self.__cards = []
+        self.suffix = str(suffix)
 
     # Implement me: It's your turn. Decide whether you'd like to
     # take the current card, or decline and put a token on it
@@ -48,12 +49,11 @@ class PlayerBase():
     def _get_chips(self):
         return self.__chips
 
-    @classmethod
-    def get_name(cls):
-        if cls.NAME is None:
+    def get_name(self):
+        if self.NAME is None:
             raise Exception("No name given for player!")
 
-        return cls.NAME
+        return self.NAME + self.suffix
 
     def get_cards(self):
         return self.__cards.copy()

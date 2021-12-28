@@ -17,7 +17,19 @@ class Game():
         while len(self._deck) > 0:
             self._take_turn()
 
-        self._end_game()
+        winners = self._get_winners()
+        if self.verbose:
+            print("##### GAME OVER!! #####")
+            self._print_scores()
+            print("WINNER(S): {}!".format(
+                winners[0].get_name() if len(winners) == 1 else str([p.get_name() for p in winners]
+            )))
+
+        return winners
+
+    def _print_scores(self):
+        for p in self._players:
+            print("{}: {} points".format(p.get_name(), p.get_score()))
 
 
     def _take_turn(self):
@@ -53,23 +65,18 @@ class Game():
             raise Exception("Cannot flip card from empty deck!")
         self._current_card = self._deck.pop()
 
-    def _end_game(self):
-        if self.verbose:
-            print("##### GAME OVER!! #####")
-            best_score = 100000
-            winners = None
-            for p in self._players:
-                score = p.get_score()
-                if score < best_score:
-                    best_score = score
-                    winners = [p]
-                elif score == best_score:
-                    winner.append(p)
-                print("{}: {} points".format(p.get_name(), p.get_score()))
+    def _get_winners(self):
+        best_score = 100000
+        winners = None
+        for p in self._players:
+            score = p.get_score()
+            if score < best_score:
+                best_score = score
+                winners = [p]
+            elif score == best_score:
+                winners.append(p)
 
-            print("WINNER(S): {}!".format(
-                winners[0].get_name() if len(winners) == 1 else str([p.get_name() for p in winners]
-            )))
+        return winners
 
     def _print_state(self):
         print("------ Current State -------")
