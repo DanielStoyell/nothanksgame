@@ -5,7 +5,7 @@ class Game():
     def __init__(self, players, verbose=False, manual=False):
         cards = list(range(3, 36))
         random.shuffle(cards)
-        self._deck = cards[8:]
+        self._deck = cards[9:]
         self._players = players
         self._flip_card()
         self._chips_on_card = 0
