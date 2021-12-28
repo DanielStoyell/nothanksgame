@@ -3,6 +3,11 @@ import random
 
 class DumboPlayer(PlayerBase):
     NAME = "Dumbo"
+    def __init__(self, *args, **kwargs):
+        # Must call super if you define your own constructor
+        super().__init__(*args, **kwargs)
+
+        self.turns_elapsed = 0
 
     def decide_impl(self, game):
         if self._get_chips() == 0:
@@ -14,4 +19,4 @@ class DumboPlayer(PlayerBase):
             return TAKE
 
     def turn_update_impl(self, game, player, decision):
-        pass
+        self.turns_elapsed += 1
