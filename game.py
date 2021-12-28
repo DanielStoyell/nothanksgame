@@ -24,6 +24,9 @@ class Game():
         player = self._players[self._current_player]
 
         decision = player.decide(self)
+        for p in self._players:
+            p.turn_update_impl(self, player, decision)
+
         if decision == TAKE:
             player.take_card(self._current_card)
             player.add_chips(self._chips_on_card)

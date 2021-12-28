@@ -12,3 +12,6 @@ class DumboPlayer(PlayerBase):
             return DECLINE
         else:
             return TAKE
+
+    def turn_update_impl(self, game, player, decision):
+        pass

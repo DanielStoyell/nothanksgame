@@ -8,8 +8,17 @@ class PlayerBase():
         self.__chips = 11
         self.__cards = []
 
+    # Implement me: It's your turn. Decide whether you'd like to
+    # take the current card, or decline and put a token on it
     def decide_impl(self, game):
         raise Exception("Decide not implemented!")
+
+    # Implement me: A player just made a decision, but their decision
+    # hasn't been evaluated yet (i.e. no additional tokens have been
+    # placed and no cards have been taken). Feel free to update any
+    # internal state as you'd like, or just pass
+    def turn_update_impl(self, game, player, decision):
+        raise Exception("Turn update not implemented!")
 
     def decide(self, game):
         decision = self.decide_impl(game)

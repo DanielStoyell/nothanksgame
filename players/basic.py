@@ -11,3 +11,6 @@ class BasicPlayer(PlayerBase):
             return TAKE
 
         return DECLINE
+
+    def turn_update_impl(self, game, player, decision):
+        pass
