@@ -15,4 +15,4 @@ Note that you're not allowed to return `DECLINE` if you have no chips. You'll be
 
 # Tournament Scoring
 
-Tournaments are played over a large number of rounds with 5 random players in each round. The player with the highest win percentage wins!
+Tournaments are played over a large number of rounds with 5 random players in each round. The player with the highest win percentage wins! A tie is considered a win.
