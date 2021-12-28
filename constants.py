@@ -1,0 +1,2 @@
+TAKE = "take"
+DECLINE = "decline"
