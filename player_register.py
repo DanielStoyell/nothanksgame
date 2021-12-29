@@ -5,8 +5,8 @@ from players.NoProbablem import NoProbablemPlayer
 
 PLAYER_REGISTER = [
     DanBot,
-    DanBot,
-    DanBot,
-    DanBot,
+    NoProbablemPlayer,
+    NoProbablemPlayer,
+    NoProbablemPlayer,
     NoProbablemPlayer,
 ]
