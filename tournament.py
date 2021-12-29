@@ -27,7 +27,12 @@ class Tournament(object):
 
             print(f"Round {n+1}: {','.join(p.get_name() for p in winners)} wins!")
 
+        players_with_scores = []
         for i, P in enumerate(self.players):
             plays = self.games_played[i]
             wins = self.victories[i]
-            print(f"{P(i).get_name()} | Win %: {round(wins/plays * 100.0,2)}% | Games: {plays} | Wins: {wins}")
+            players_with_scores.append((P(i).get_name(), round(wins/plays * 100.0,2), plays, wins))
+
+        players_with_scores.sort(key=lambda p: p[1], reverse=True)
+        for p in players_with_scores:
+            print(f"{p[0]} | Win %: {p[1]}% | Games: {p[2]} | Wins: {p[3]}")
