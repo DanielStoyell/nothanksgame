@@ -22,7 +22,11 @@ class PlayerBase():
         raise Exception("Turn update not implemented!")
 
     def decide(self, game):
-        decision = self.decide_impl(game)
+        try:
+            decision = self.decide_impl(game)
+        except:
+            print(f"{self.get_name()} threw an exception! Defaulting to TAKE")
+            return TAKE
 
         if self.__chips == 0 and decision == DECLINE:
             print("Cannot decline with no chips! Overriding decision!")
