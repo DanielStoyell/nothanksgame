@@ -2,14 +2,15 @@ import random
 
 from game import *
 from players.NoProbablem import *
+from players.danbot import *
 
 
 class Evolver(object):
     GAME_SIZE = 5
-    ROUNDS = 1000
-    LEARNING_RATE = 0.1
-    POPULATION_SIZE = 20
-    CULL_SIZE = 10
+    ROUNDS = 10000
+    LEARNING_RATE = 0.2
+    POPULATION_SIZE =   5
+    CULL_SIZE = 3
 
     def __init__(self):
         self.population = [
@@ -30,10 +31,10 @@ class Evolver(object):
         while True:
             for n in range(self.ROUNDS):
                 players = {}
-                for i in random.sample(range(len(self.population)), 5):
+                for i in random.sample(range(len(self.population)), 1):
                     players[i] = NoProbablemPlayer(hyperparams=self.population[i])
 
-                game = Game(list(players.values()))
+                game = Game(list(players.values()) + [DanBot(), DanBot(), DanBot(), DanBot()])
                 winners = game.play_game()
                 for i, p in players.items():
                     self.games_played[i] += 1
@@ -48,8 +49,10 @@ class Evolver(object):
                 wins = self.victories[i]
                 scores.append(wins / plays)
             sorted_population = list(sorted(zip(scores, self.population), key=lambda x:-x[0]))[:self.CULL_SIZE]
+            best_scores = [x[0] for x in sorted_population]
             self.population = [x[1] for x in sorted_population]
             print("\n\n\n##############################################")
+            print(best_scores)
             for h,v in self.population[0].items():
                 print(h, v)
             print("##############################################\n\n\n")

@@ -5,11 +5,11 @@ class NoProbablemPlayer(PlayerBase):
     NAME = "NoProbablem"
 
     HYPERPARAMS = {
-        "extortion_threshold": 0.750589,
-        # scale chip value by 1 + chip_utility_base^(chip_utility_scale-curr_chips)
-        "chip_utility_base": 5.2353,
-        "chip_utility_scale": 5.92220,
-        "take_threshold": 0.490314,
+        "extortion_threshold": 0.4179,
+        # scale chip value by 1 + chip_utility_factor * e^(-chip_utility_scale*curr_chips)
+        "chip_utility_factor": 6.30524,
+        "chip_utility_scale": 0.6541,
+        "take_threshold": 0.4523,
     }
 
     def __init__(self, *args, **kwargs):
@@ -21,10 +21,10 @@ class NoProbablemPlayer(PlayerBase):
         super().__init__(*args, **kwargs)
 
     def decide_impl(self, game):
-        if self._get_chips() == 0:
+        if self.get_chips() == 0:
             return TAKE
 
-        card_util = self.get_current_card_utility(game, self)
+        card_util = self.get_current_card_utility_ev(game, self)
         chip_util = self.get_current_chip_utility(game, self)
         # print(f"Card util: {card_util}")
         # print(f"Chip util: {chip_util}")
@@ -49,12 +49,14 @@ class NoProbablemPlayer(PlayerBase):
 
     # Relative value of current card to me relative to player who wants it next most
     def get_should_extort(self, game):
+        if self.get_current_card_utility_ev(game, self) < 0:
+            return False
         players = self.get_players(game)
         values = []
         ratios = []
         for i, player in enumerate(players):
             card_util = self.get_current_card_utility(game, player)
-            chip_util = self.get_current_chip_utility(game, player, i)
+            chip_util = self.get_current_chip_utility(game, player, i) if i != 0 else 0
             values.append(card_util + chip_util)
             if card_util >= 0:
                 ratios.append(99999)
@@ -71,13 +73,13 @@ class NoProbablemPlayer(PlayerBase):
     # How much the player values the chips on the current card (or how many chips will be there when it's their turn)
     def get_current_chip_utility(self, game, player, turns_until=0):
         card_chips = game.get_chips_on_card() + turns_until
-        player_chips = player._get_chips()
-        chip_utility_base = self.hyperparams["chip_utility_base"]
+        player_chips = player.get_chips()
+        chip_utility_factor = self.hyperparams["chip_utility_factor"]
         chip_utility_scale = self.hyperparams["chip_utility_scale"]
 
         # inverse points - positive is GOOD, negative BAD
         return card_chips * (
-            1 + chip_utility_base ** (chip_utility_scale - player_chips)
+            1 + chip_utility_factor * 2.71828 ** (-chip_utility_scale * player_chips)
         )
 
     # How the current card affects the given players score (or potential future score)
@@ -110,15 +112,15 @@ class NoProbablemPlayer(PlayerBase):
             new_score = self.get_player_card_score(
                 sorted(cards + [curr_card, curr_card + run_direction])
             )
-            connector_exists_prob = game.get_deck_length / (game.get_deck_length + 9)
+            connector_exists_prob = game.get_deck_length() / (game.get_deck_length() + 9)
             connector_exists_probs.append(connector_exists_prob)
             connector_exists_values.append(curr_score - new_score)
 
         curr_score = self.get_player_card_score(cards)
         new_score = self.get_player_card_score(sorted(cards + [curr_card]))
 
-        return (curr_score - new_score) * (1 - sum(connector_exists_prob)) + (
-            prob * v for prob, v in zip(connector_exists_prob, connector_exists_values)
+        return (curr_score - new_score) * (1 - sum(connector_exists_probs)) + sum(
+            prob * v for prob, v in zip(connector_exists_probs, connector_exists_values)
         )
 
         # inverse points - positive is GOOD, negative BAD
@@ -126,7 +128,7 @@ class NoProbablemPlayer(PlayerBase):
 
     def get_all_revealed_cards(self, game):
         cards = []
-        for player in self.get_players():
+        for player in self.get_players(game):
             cards.extend(player.get_cards())
         return cards
 

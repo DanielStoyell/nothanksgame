@@ -9,15 +9,16 @@ from player_register import *
 from players.basic import *
 from players.dumbo import *
 from players.NoProbablem import *
+from players.danbot import *
 
 from constants import *
 
 PLAYERS = [
-    DumboPlayer(),
-    DumboPlayer(),
-    BasicPlayer(),
-    BasicPlayer(),
-    NoProbablemPlayer(),
+    DanBot(1),
+    DanBot(2),
+    NoProbablemPlayer(3),
+    NoProbablemPlayer(4),
+    NoProbablemPlayer(5),
 ]
 
 random.shuffle(PLAYERS)
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('-e','--evolve', dest='evolve', action='store_const', const=True, default=False, help='Use tournament')
     args = parser.parse_args()
     if args.tournament:
-        tournament = Tournament(PLAYER_REGISTER, 10000)
+        tournament = Tournament(PLAYER_REGISTER, 30000)
         tournament.host_tournament()
     elif args.evolve:
         evolver = Evolver()
