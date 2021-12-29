@@ -10,7 +10,7 @@ class DumboPlayer(PlayerBase):
         self.turns_elapsed = 0
 
     def decide_impl(self, game):
-        if self._get_chips() == 0:
+        if self.get_chips() == 0:
             return TAKE
 
         if random.random() > .2:

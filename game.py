@@ -83,7 +83,7 @@ class Game():
         print("Current Card: {} | With {} chips".format(self._current_card, self._chips_on_card))
         print("Current Player: {}".format(self._players[self._current_player].get_name()))
         for p in self._players:
-            print("{}: {} chips | Cards: {}".format(p.get_name(), p._get_chips(), p.get_cards()))
+            print("{}: {} chips | Cards: {}".format(p.get_name(), p.get_chips(), p.get_cards()))
 
 
     ## GETTERS
