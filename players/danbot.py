@@ -15,11 +15,11 @@ class DanBot(PlayerBase):
         if self.get_chips() == 0:
             return TAKE
 
-        opponents = [p for p in game.get_players() if p is not self]
-
         ratio = self.get_ratio(game)
         if ratio >= self.TAKE_RATIO:
             return TAKE
+
+        opponents = [p for p in game.get_players() if p is not self]
 
         is_run_with_self = game.get_current_card() in self.get_run_cards_for_player(self, game)
         is_run_with_other = True in [
