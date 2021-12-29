@@ -5,15 +5,21 @@ class DanBot(PlayerBase):
     TAKE_RATIO = .4
     EXTORT_RATIO = .25
 
+    def __init__(self, *args, **kwargs):
+        # Must call super if you define your own constructor
+        super().__init__(*args, **kwargs)
+
+        self.potential_deck = set(range(3,36))
+
     def decide_impl(self, game):
         if self.get_chips() == 0:
             return TAKE
 
-        opponents = [p for p in game.get_players() if p is not self]
-
         ratio = self.get_ratio(game)
         if ratio >= self.TAKE_RATIO:
             return TAKE
+
+        opponents = [p for p in game.get_players() if p is not self]
 
         is_run_with_self = game.get_current_card() in self.get_run_cards_for_player(self, game)
         is_run_with_other = True in [
@@ -29,7 +35,8 @@ class DanBot(PlayerBase):
         return DECLINE
 
     def turn_update_impl(self, game, player, decision):
-        pass
+        if game.get_current_card() in self.potential_deck:
+            self.potential_deck.remove(game.get_current_card())
 
     def get_ratio(self, game):
         return game.get_chips_on_card() / game.get_current_card()
@@ -37,22 +44,14 @@ class DanBot(PlayerBase):
     def get_run_cards_for_player(self, player, game):
         cards = player.get_cards()
 
-        possible_remaining_cards = self.get_possible_remaining_cards(game.get_players())
-
-        run_cards = []
+        run_cards = set()
         for card in cards:
-            if card-1 >=3 and card-1 in possible_remaining_cards:
-                run_cards.append(card-1)
-            if card+1 <= 35 and card+1 in possible_remaining_cards:
-                run_cards.append(card+1)
+            if card-1 >=3 and (card-1 in self.potential_deck or card-1 == game.get_current_card()):
+                run_cards.add(card-1)
+            if card+1 <= 35 and (card+1 in self.potential_deck  or card+1 == game.get_current_card()):
+                run_cards.add(card+1)
 
         return run_cards
-
-    def get_possible_remaining_cards(self, players):
-        cards_out = {c for p in players for c in p.get_cards()}
-        possible_cards = set(range(3,36))
-
-        return possible_cards - cards_out
 
     def card_utility(self, player, card, game):
         u = card
