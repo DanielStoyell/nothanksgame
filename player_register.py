@@ -5,4 +5,5 @@ from players.danbot import DanBot, DanBotFactory
 PLAYER_REGISTER = [
     BasicPlayer,
     DumboPlayer,
+    DanBot,
 ]

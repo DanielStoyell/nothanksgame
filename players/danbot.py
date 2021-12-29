@@ -2,7 +2,7 @@ from player import *
 
 class DanBot(PlayerBase):
     NAME = "DanBot"
-    TAKE_RATIO = .35
+    TAKE_RATIO = .4
     EXTORT_RATIO = .25
 
     def decide_impl(self, game):
