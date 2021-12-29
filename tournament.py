@@ -9,12 +9,12 @@ class Tournament(object):
         self.players = players
         while len(self.players) < 5:
             self.players = self.players + players
-        print(self.players)
         self.rounds = rounds
         self.victories = {i:0 for i,_ in enumerate(self.players)}
         self.games_played = {i:0 for i,_ in enumerate(self.players)}
 
     def host_tournament(self):
+        print("#### Starting Tournament ####")
         for n in range(self.rounds):
             players = random.sample(range(len(self.players)), Tournament.GAME_SIZE)
             players = {i: self.players[i](i) for i in players}

@@ -1,7 +1,11 @@
 from players.basic import BasicPlayer
 from players.dumbo import DumboPlayer
+from players.NoProbablem import NoProbablemPlayer
 
 PLAYER_REGISTER = [
     BasicPlayer,
-    DumboPlayer
+    BasicPlayer,
+    BasicPlayer,
+    BasicPlayer,
+    NoProbablemPlayer,
 ]

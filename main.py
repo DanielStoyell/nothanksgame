@@ -7,6 +7,7 @@ from tournament import *
 from player_register import *
 from players.basic import *
 from players.dumbo import *
+from players.NoProbablem import *
 
 from constants import *
 
@@ -15,6 +16,7 @@ PLAYERS = [
     DumboPlayer(),
     BasicPlayer(),
     BasicPlayer(),
+    NoProbablemPlayer(),
 ]
 
 random.shuffle(PLAYERS)
