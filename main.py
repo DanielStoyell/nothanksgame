@@ -12,10 +12,10 @@ from constants import *
 
 PLAYERS = [
     DumboPlayer(),
-    DumboPlayer(),
     BasicPlayer(),
-    BasicPlayer(),
+    DumboSally(),
     DanBot(),
+    DanBotFactory(True)()
 ]
 
 random.shuffle(PLAYERS)

@@ -22,8 +22,9 @@ class PlayerBase():
         raise Exception("Turn update not implemented!")
 
     def decide(self, game):
+        decision = self.decide_impl(game)
         try:
-            decision = self.decide_impl(game)
+            pass
         except:
             print(f"{self.get_name()} threw an exception! Defaulting to TAKE")
             return TAKE

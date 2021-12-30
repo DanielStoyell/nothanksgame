@@ -7,5 +7,6 @@ PLAYER_REGISTER = [
     BasicPlayer,
     DumboPlayer,
     DanBot,
-    DumboSally
+    DumboSally,
+    DanBotFactory(True)
 ]
