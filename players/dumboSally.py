@@ -11,9 +11,9 @@ class DumboSally(PlayerBase):
 
     def opponents(self, game):
         self.others = [p for p in game.get_players() if p is not self]
-        print(self.others)
+        # print(self.others)
         return self.others
-    
+
     def decide_impl(self, game):
         if self.get_chips() == 0:
             return TAKE
@@ -28,7 +28,7 @@ class DumboSally(PlayerBase):
             #Extort
             else:
                 if game.get_chips_on_card() / game.get_current_card() > .2:
-                    return TAKE 
+                    return TAKE
                 else:
                     return DECLINE
 
@@ -41,5 +41,5 @@ class DumboSally(PlayerBase):
     def turn_update_impl(self, game, player, decision):
         if decision == TAKE and game.get_current_card() not in self.others_cards:
             self.others_cards.append(game.get_current_card())
-        print(f"Others cards: {self.others_cards}")
-        print(f"My cards: {self.get_cards()}")
+        # print(f"Others cards: {self.others_cards}")
+        # print(f"My cards: {self.get_cards()}")

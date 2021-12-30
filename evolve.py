@@ -3,12 +3,13 @@ import random
 from game import *
 from players.NoProbablem import *
 from players.danbot import *
+from players.dumboDan import *
 from players.basic import *
 
 
 class Evolver(object):
     GAME_SIZE = 5
-    ROUNDS = 10000
+    ROUNDS = 1000
     LEARNING_RATE = 0.2
     POPULATION_SIZE = 6
     CULL_SIZE = 3
@@ -27,6 +28,13 @@ class Evolver(object):
             for h, v in hyperparams.items()
         }
 
+    def optimize_individually(self):
+        params = dict(NoProbablemPlayer.HYPERPARAMS)
+        for h, v in NoProbablemPlayer.HYPERPARAMS.items():
+            print("Optimizing", h)
+
+    # def get_win_rate
+
     def evolve(self):
         print("#### Starting Tournament ####")
         while True:
@@ -35,7 +43,7 @@ class Evolver(object):
                 for i in random.sample(range(len(self.population)), 1):
                     players[i] = NoProbablemPlayer(hyperparams=self.population[i])
 
-                game = Game(list(players.values()) + [BasicPlayer(), DanBotFactory(True)(), DanBotFactory(True)(), DanBot()])
+                game = Game(list(players.values()) + [BasicPlayer(), DanBot(), DanBot(), DumboDan()])
                 winners = game.play_game()
                 for i, p in players.items():
                     self.games_played[i] += 1

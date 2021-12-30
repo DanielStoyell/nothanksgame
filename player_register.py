@@ -7,8 +7,8 @@ from players.dumboDan import DumboDan, DumboDanFactory
 from players.dumboSally import DumboSally
 
 PLAYER_REGISTER = [
+    NoProbablemPlayer,
     BasicPlayer,
-    DumboPlayer,
     DanBot,
     DumboDan,
     DumboSally,
