@@ -3,13 +3,14 @@ import random
 from game import *
 from players.NoProbablem import *
 from players.danbot import *
+from players.basic import *
 
 
 class Evolver(object):
     GAME_SIZE = 5
     ROUNDS = 10000
     LEARNING_RATE = 0.2
-    POPULATION_SIZE =   5
+    POPULATION_SIZE = 6
     CULL_SIZE = 3
 
     def __init__(self):
@@ -34,7 +35,7 @@ class Evolver(object):
                 for i in random.sample(range(len(self.population)), 1):
                     players[i] = NoProbablemPlayer(hyperparams=self.population[i])
 
-                game = Game(list(players.values()) + [DanBot(), DanBot(), DanBot(), DanBot()])
+                game = Game(list(players.values()) + [BasicPlayer(), DanBot(), DanBot(), DanBot()])
                 winners = game.play_game()
                 for i, p in players.items():
                     self.games_played[i] += 1
