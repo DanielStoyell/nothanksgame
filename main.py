@@ -14,11 +14,11 @@ from players.danbot import *
 from constants import *
 
 PLAYERS = [
-    DanBot(1),
-    DanBot(2),
-    NoProbablemPlayer(3),
-    NoProbablemPlayer(4),
-    NoProbablemPlayer(5),
+    DumboPlayer(),
+    BasicPlayer(),
+    DumboSally(),
+    DanBot(),
+    DanBotFactory(True)()
 ]
 
 random.shuffle(PLAYERS)
