@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='No Thanks game engine.')
     parser.add_argument('-v','--verbose', dest='verbose', action='store_const', const=True, default=False, help='Use verbose mode')
     parser.add_argument('-m','--manual', dest='manual', action='store_const', const=True, default=False, help='Use manual mode')
-    parser.add_argument('-t','--tournament', dest='tournament', default=False, help='Use tournament')
+    parser.add_argument('-t','--tournament', dest='tournament', default=None, help='Use tournament')
     parser.add_argument('-e','--evolve', dest='evolve', action='store_const', const=True, default=False, help='Use tournament')
     parser.add_argument('-o','--optimize', dest='optimize', action='store_const', const=True, default=False, help='Use tournament')
     args = parser.parse_args()
