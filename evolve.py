@@ -1,5 +1,8 @@
 import random
-import progressbar
+try:
+    from progressbar import progressbar
+except:
+    progressbar = lambda x:x
 
 from game import *
 from players.NoProbablem import *
@@ -65,7 +68,7 @@ class Evolver(object):
 
     def get_win_rate(self, params):
         wins = 0
-        for n in progressbar.progressbar(range(self.ROUNDS)):
+        for n in progressbar(range(self.ROUNDS)):
             player = NoProbablemPlayer(hyperparams=params)
 
             game = Game([player, DumboSally(), DanBot(), DanBot(), DumboDan()])
