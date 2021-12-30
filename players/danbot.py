@@ -19,6 +19,9 @@ class DanBot(PlayerBase):
         if self.get_chips() == 0:
             return TAKE
 
+        if mueller_investigation(game):
+            return TAKE
+
         take_utility = self.take_card_utility(
             self,
             game.get_current_card(),
@@ -152,6 +155,14 @@ class DanBot(PlayerBase):
 
         return score
 
+    def mueller_investigation(self, game):
+        colluders = [p for p in game.players() if (p is not self and self.NAME in p.get_name())]
+        non_colluders = [p for p in game.players() if (self.NAME not in p.get_name())]
+        highest_colluder_score = max([p.get_score() for p in colluders])
+
+        should_collude = not any([highest_colluder_score > p.get_score() for p in non_colluders])
+
+        return should_collude
 
 
 
