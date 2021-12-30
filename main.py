@@ -17,8 +17,8 @@ PLAYERS = [
     NoProbablemPlayer(1),
     NoProbablemPlayer(2),
     DanBot(),
-    DanBotFactory(True)(1),
-    DanBotFactory(True)(2)
+    DumboDan(),
+    DumboDan(),
 ]
 
 random.shuffle(PLAYERS)

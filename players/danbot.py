@@ -3,13 +3,11 @@ from player import *
 
 class DanBot(PlayerBase):
     NAME = "DanBot"
-    IS_PROBABILISTIC = False
-    TAKE_RATIO = .4
-    EXTORT_RATIO = .25
     GET_CARD_PROB_MODIFIER = .8
     CARD_CHIP_VALUE_RATIO = .3
     CHIP_UTILITY_MODIFIER = 1
-    MAX_LOW_CHIP_PENALTY = 15
+    MAX_LOW_CHIP_PENALTY = 20
+    EXTORT_UTILITY_BUFFER = 7
 
     def __init__(self, *args, **kwargs):
         # Must call super if you define your own constructor
@@ -21,41 +19,39 @@ class DanBot(PlayerBase):
         if self.get_chips() == 0:
             return TAKE
 
-        if self.IS_PROBABILISTIC:
-            should_take = self.should_take_card(
-                self,
-                game.get_current_card(),
-                game.get_chips_on_card(),
-                self.get_cards(),
-                self.get_chips(),
-                game.get_deck_length(),
-                game.get_current_card(),
-                game.get_players()
-            )
-            if should_take:
-                return TAKE
-            else:
-                return DECLINE
+        take_utility = self.take_card_utility(
+            self,
+            game.get_current_card(),
+            game.get_chips_on_card(),
+            self.get_cards(),
+            self.get_chips(),
+            game.get_deck_length(),
+            game.get_current_card(),
+            game.get_players()
+        )
+        if take_utility > 0:
+            return DECLINE
 
+        players = game.get_players()
+        self_index = players.index(self)
+        opponents = (players[self_index:] + players[:self_index])[1:]
 
-        ratio = self.get_ratio(game)
-        if ratio >= self.TAKE_RATIO:
-            return TAKE
+        opponent_utilities = [self.take_card_utility(
+            p,
+            game.get_current_card(),
+            game.get_chips_on_card()+i+1,
+            p.get_cards(),
+            p.get_chips(),
+            game.get_deck_length(),
+            game.get_current_card(),
+            game.get_players()
+        ) for i,p in enumerate(opponents) if p is not self]
 
-        opponents = [p for p in game.get_players() if p is not self]
-
-        is_run_with_self = game.get_current_card() in self.get_run_cards_for_player(self.get_cards(), game.get_current_card())
-        is_run_with_other = True in [
-            game.get_current_card() in self.get_run_cards_for_player(p.get_cards(), game.get_current_card()) for p in opponents
-        ]
-
-        if is_run_with_self and is_run_with_other:
-            return TAKE
-
-        if is_run_with_self and not is_run_with_other and ratio >= self.EXTORT_RATIO:
+        if any([u - self.EXTORT_UTILITY_BUFFER < 0 for u in opponent_utilities]):
             return TAKE
 
         return DECLINE
+
 
     def turn_update_impl(self, game, player, decision):
         if game.get_current_card() in self.potential_deck:
@@ -74,7 +70,7 @@ class DanBot(PlayerBase):
 
         return run_cards
 
-    def should_take_card(self, player, card, chips_on_card, cards, chips, deck_length, current_card, players):
+    def take_card_utility(self, player, card, chips_on_card, cards, chips, deck_length, current_card, players):
         utility_before = self.compute_player_utility(
             player,
             cards,
@@ -91,11 +87,9 @@ class DanBot(PlayerBase):
             -1,
             players
         )
-        # print(f"Considering {card} with {chips_on_card} chips on it...")
-        # print(f"Utility before: {utility_before} | Utility after: {utility_after}")
 
         # Utility is bad!
-        return utility_after < utility_before
+        return utility_after - utility_before
 
     def compute_player_utility(self, player, cards, chips, deck_length, current_card, players):
         card_set_utility = self.get_card_set_utility(player, cards, current_card, deck_length, players)
@@ -161,15 +155,31 @@ class DanBot(PlayerBase):
 
 
 
-def DanBotFactory(is_prob=False):
-    extort_ratio = round(random.gauss(.25, .15), 2)
-    take_ratio = round(random.gauss(.4, .2), 2)
+def DanBotFactory():
+    get_card_prob_modifier = DanBot.GET_CARD_PROB_MODIFIER
+    card_chip_value_ratio = DanBot.CARD_CHIP_VALUE_RATIO
+    chip_utility_modifier = DanBot.CHIP_UTILITY_MODIFIER
+    max_low_chip_penalty = DanBot.MAX_LOW_CHIP_PENALTY
+
+    which = random.randint(1,4)
+    if which == 1:
+        get_card_prob_modifier = round(random.gauss(.8, .8/2), 3)
+        name = f"DanBotVariant (get_card_prob_mod: {get_card_prob_modifier}) "
+    elif which == 2:
+        card_chip_value_ratio = round(random.gauss(.3, .3/2), 3)
+        name = f"DanBotVariant (card_chip_value_ratio: {card_chip_value_ratio}) "
+    elif which == 3:
+        chip_utility_modifier = round(random.gauss(1, 1/2), 3)
+        name = f"DanBotVariant (chip_utility_modifier: {chip_utility_modifier}) "
+    elif which == 4:
+        max_low_chip_penalty = round(random.gauss(15, 15/2), 3)
+        name = f"DanBotVariant (max_low_chip_penalty: {max_low_chip_penalty}) "
 
     class DanBotVariant(DanBot):
-        # NAME = f"DanBotVariant (take: {take_ratio} | extort {extort_ratio})"
-        NAME = "DanBotProbability"
-        TAKE_RATIO = take_ratio
-        EXTORT_RATIO = extort_ratio
-        IS_PROBABILISTIC = is_prob
+        NAME = name
+        GET_CARD_PROB_MODIFIER = get_card_prob_modifier
+        CARD_CHIP_VALUE_RATIO = card_chip_value_ratio
+        CHIP_UTILITY_MODIFIER = chip_utility_modifier
+        MAX_LOW_CHIP_PENALTY = max_low_chip_penalty
 
     return DanBotVariant
