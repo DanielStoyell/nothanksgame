@@ -22,7 +22,7 @@ class DumboSally(PlayerBase):
             #Steal
             if ((game.get_current_card() + 1) in self.others_cards) or ((game.get_current_card() - 1) in self.others_cards):
                 return TAKE
-            current_chips = [p.get_chips for p in opponents()]
+            current_chips = [p.get_chips for p in self.opponents(game)]
             if 0 in current_chips:
                 return TAKE #if any person has 0 chips, just take the card in the run
             #Extort
@@ -39,7 +39,9 @@ class DumboSally(PlayerBase):
             return DECLINE
 
     def turn_update_impl(self, game, player, decision):
-        if decision == TAKE and game.get_current_card() not in self.others_cards:
+        if decision == TAKE and player!=self and game.get_current_card() not in self.others_cards:
             self.others_cards.append(game.get_current_card())
         # print(f"Others cards: {self.others_cards}")
         # print(f"My cards: {self.get_cards()}")
+        #print(f"Others cards: {self.others_cards}")
+        #print(f"My cards: {self.get_cards()}")
