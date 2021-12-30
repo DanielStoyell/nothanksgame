@@ -24,7 +24,7 @@ class PlayerBase():
     def decide(self, game):
         try:
             decision = self.decide_impl(game)
-        except:
+        except Exception as e:
             print(f"{self.get_name()} threw an exception! Defaulting to TAKE")
             raise e
             return TAKE

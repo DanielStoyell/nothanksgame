@@ -14,11 +14,11 @@ from players.danbot import *
 from constants import *
 
 PLAYERS = [
-    DumboPlayer(),
-    BasicPlayer(),
-    DumboSally(),
+    NoProbablemPlayer(1),
+    NoProbablemPlayer(2),
     DanBot(),
-    DanBotFactory(True)()
+    DanBotFactory(True)(1),
+    DanBotFactory(True)(2)
 ]
 
 random.shuffle(PLAYERS)
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('-e','--evolve', dest='evolve', action='store_const', const=True, default=False, help='Use tournament')
     args = parser.parse_args()
     if args.tournament:
-        tournament = Tournament(PLAYER_REGISTER, 30000)
+        tournament = Tournament(PLAYER_REGISTER, 1000)
         tournament.host_tournament()
     elif args.evolve:
         evolver = Evolver()

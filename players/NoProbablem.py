@@ -11,7 +11,8 @@ class NoProbablemPlayer(PlayerBase):
         # scale chip value by 1 + chip_utility_factor * e^(-chip_utility_scale*curr_chips)
         "chip_utility_factor": 7.64079,
         "chip_utility_scale": 0.8985,
-        "take_threshold": 0.50052,
+        "take_threshold_high": 0.9,
+        "take_threshold_low": 0.35,
     }
 
     def __init__(self, *args, **kwargs):
@@ -41,13 +42,17 @@ class NoProbablemPlayer(PlayerBase):
 
         # print(f"Ratio: {chip_util / -card_util}")
 
-        if chip_util / -card_util > self.hyperparams["take_threshold"]:
+        if chip_util / -card_util > self.get_take_threshold(game):
             return TAKE
 
         return DECLINE
 
     def turn_update_impl(self, game, player, decision):
         pass
+
+    def get_take_threshold(self, game):
+        diff = self.hyperparams["take_threshold_high"] - self.hyperparams["take_threshold_low"]
+        return self.hyperparams["take_threshold_high"] - (diff/(33-9) * game.get_deck_length())
 
     # Relative value of current card to me relative to player who wants it next most
     def get_should_extort(self, game):

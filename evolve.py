@@ -35,7 +35,7 @@ class Evolver(object):
                 for i in random.sample(range(len(self.population)), 1):
                     players[i] = NoProbablemPlayer(hyperparams=self.population[i])
 
-                game = Game(list(players.values()) + [BasicPlayer(), DanBot(), DanBot(), DanBot()])
+                game = Game(list(players.values()) + [BasicPlayer(), DanBotFactory(True)(), DanBotFactory(True)(), DanBot()])
                 winners = game.play_game()
                 for i, p in players.items():
                     self.games_played[i] += 1

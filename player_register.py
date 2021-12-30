@@ -6,9 +6,9 @@ from players.danbot import DanBot, DanBotFactory
 from players.dumboSally import DumboSally
 
 PLAYER_REGISTER = [
-    DanBot,
-    DanBot,
-    DanBot,
-    DumboSally,
-    DanBotFactory(True)
+    DanBotFactory(True),
+    DanBotFactory(True),
+    DanBotFactory(True),
+    NoProbablemPlayer,
+    NoProbablemPlayer,
 ]
