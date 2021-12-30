@@ -9,7 +9,6 @@ class Tournament(object):
         self.players = players
         while len(self.players) < 5:
             self.players = self.players + players
-        print(self.players)
         self.rounds = rounds
         self.victories = {i:0 for i,_ in enumerate(self.players)}
         self.games_played = {i:0 for i,_ in enumerate(self.players)}

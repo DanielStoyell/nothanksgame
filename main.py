@@ -15,7 +15,7 @@ PLAYERS = [
     BasicPlayer(),
     DumboSally(),
     DanBot(),
-    DanBotFactory(True)()
+    DumboDan(),
 ]
 
 random.shuffle(PLAYERS)
