@@ -4,14 +4,14 @@ from functools import reduce
 
 class NoProbablemPlayer(PlayerBase):
     NAME = "NoProbablem"
-    RUN_CONSIDERATION_SIZE = 3
+    RUN_CONSIDERATION_SIZE = 2
 
     HYPERPARAMS = {
-        "extortion_threshold": 0.45121,
+        "extortion_threshold": 0.4366890,
         # scale chip value by 1 + chip_utility_factor * e^(-chip_utility_scale*curr_chips)
-        "chip_utility_factor": 7.64079,
+        "chip_utility_factor": 5.4136,
         "chip_utility_scale": 0.8985,
-        "take_threshold_high": 0.9,
+        "take_threshold_high": 0.648,
         "take_threshold_low": 0.35,
     }
 
@@ -177,10 +177,10 @@ class NoProbablemPlayer(PlayerBase):
         return game.get_deck_length() / (game.get_deck_length() + 9)
 
     def get_all_revealed_cards(self, game):
-        cards = []
+        cards = set()
         for player in self.get_players(game):
-            cards.extend(player.get_cards())
-        return cards
+            cards.update(player.get_cards())
+        return set(cards)
 
     def get_player_card_score(self, cards):
         score = 0

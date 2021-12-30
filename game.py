@@ -7,6 +7,7 @@ class Game():
         random.shuffle(cards)
         self._deck = cards[9:]
         self._players = players
+        random.shuffle(self._players)
         self._flip_card()
         self._chips_on_card = 0
         self._current_player = 0
