@@ -8,8 +8,8 @@ from players.dumboSally import DumboSally
 
 PLAYER_REGISTER = [
     DanBot,
-    DanBot,
+    DumboPlayer,
+    BasicPlayer,
     NoProbablemPlayer,
-    NoProbablemPlayer,
-    DumboSally,
+    DumboSally
 ]

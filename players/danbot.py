@@ -4,10 +4,12 @@ from player import *
 class DanBot(PlayerBase):
     NAME = "DanBot"
     GET_CARD_PROB_MODIFIER = .8
-    CARD_CHIP_VALUE_RATIO = .3
+    CARD_CHIP_VALUE_RATIO = .32
     CHIP_UTILITY_MODIFIER = 1
-    MAX_LOW_CHIP_PENALTY = 20
-    EXTORT_UTILITY_BUFFER = 7 # Maybe lower in games with competent opponents?
+    MAX_LOW_CHIP_PENALTY = 13
+    EXTORT_UTILITY_BUFFER = 3.7
+
+    MAX_DECK_SIZE = 24
 
     def __init__(self, *args, **kwargs):
         # Must call super if you define your own constructor
@@ -74,15 +76,15 @@ class DanBot(PlayerBase):
         return run_cards
 
     def take_card_utility(self, player, card, chips_on_card, cards, chips, deck_length, current_card, players):
-        utility_before = self.compute_player_utility(
+        utility_decline = self.compute_player_utility(
             player,
             cards,
-            chips,
+            chips-1,
             deck_length,
             current_card,
             players
         )
-        utility_after = self.compute_player_utility(
+        utility_take = self.compute_player_utility(
             player,
             cards + [card],
             chips + chips_on_card,
@@ -92,7 +94,7 @@ class DanBot(PlayerBase):
         )
 
         # Utility is bad!
-        return utility_after - utility_before
+        return utility_take - utility_decline
 
     def compute_player_utility(self, player, cards, chips, deck_length, current_card, players):
         card_set_utility = self.get_card_set_utility(player, cards, current_card, deck_length, players)
@@ -101,8 +103,10 @@ class DanBot(PlayerBase):
         return card_set_utility + chip_utility
 
     def get_chip_utility(self, chips, deck_length):
+        if chips < 0:
+            return 1000000
         # low chip penalty should scale with end of game
-        return (-chips) * (self.CHIP_UTILITY_MODIFIER + (deck_length / 24)) + (self.MAX_LOW_CHIP_PENALTY/(chips+1))
+        return (-chips) * (self.CHIP_UTILITY_MODIFIER + (deck_length / self.MAX_DECK_SIZE)) + (self.MAX_LOW_CHIP_PENALTY/(chips+1))
 
     def get_card_set_utility(self, player, cards, current_card, deck_length, players):
         wanted_cards = self.get_run_cards_for_player(cards, current_card)
@@ -171,20 +175,25 @@ def DanBotFactory():
     card_chip_value_ratio = DanBot.CARD_CHIP_VALUE_RATIO
     chip_utility_modifier = DanBot.CHIP_UTILITY_MODIFIER
     max_low_chip_penalty = DanBot.MAX_LOW_CHIP_PENALTY
+    extort_utility_buffer = DanBot.EXTORT_UTILITY_BUFFER
 
-    which = random.randint(1,4)
+    which = random.choice([4,5])
     if which == 1:
-        get_card_prob_modifier = round(random.gauss(.8, .8/2), 3)
+        get_card_prob_modifier = round(random.gauss(DanBot.GET_CARD_PROB_MODIFIER, DanBot.GET_CARD_PROB_MODIFIER/2), 3)
         name = f"DanBotVariant (get_card_prob_mod: {get_card_prob_modifier}) "
     elif which == 2:
-        card_chip_value_ratio = round(random.gauss(.3, .3/2), 3)
+        card_chip_value_ratio = round(random.gauss(DanBot.CARD_CHIP_VALUE_RATIO, DanBot.CARD_CHIP_VALUE_RATIO/2), 3)
         name = f"DanBotVariant (card_chip_value_ratio: {card_chip_value_ratio}) "
     elif which == 3:
-        chip_utility_modifier = round(random.gauss(1, 1/2), 3)
+        chip_utility_modifier = round(random.gauss(DanBot.CHIP_UTILITY_MODIFIER, DanBot.CHIP_UTILITY_MODIFIER/2), 3)
         name = f"DanBotVariant (chip_utility_modifier: {chip_utility_modifier}) "
     elif which == 4:
-        max_low_chip_penalty = round(random.gauss(15, 15/2), 3)
+        max_low_chip_penalty = round(random.gauss(DanBot.MAX_LOW_CHIP_PENALTY, DanBot.MAX_LOW_CHIP_PENALTY/2), 3)
         name = f"DanBotVariant (max_low_chip_penalty: {max_low_chip_penalty}) "
+    elif which == 5:
+        extort_utility_buffer = round(random.gauss(DanBot.EXTORT_UTILITY_BUFFER, DanBot.EXTORT_UTILITY_BUFFER/2), 3)
+        name = f"DanBotVariant (extort_utility_buffer: {extort_utility_buffer}) "
+
 
     class DanBotVariant(DanBot):
         NAME = name
@@ -192,5 +201,6 @@ def DanBotFactory():
         CARD_CHIP_VALUE_RATIO = card_chip_value_ratio
         CHIP_UTILITY_MODIFIER = chip_utility_modifier
         MAX_LOW_CHIP_PENALTY = max_low_chip_penalty
+        EXTORT_UTILITY_BUFFER = extort_utility_buffer
 
     return DanBotVariant

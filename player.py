@@ -50,7 +50,6 @@ class PlayerBase():
 
     ## GETTERS
 
-    # ONLY call within your implementation, not for other players
     def get_chips(self):
         return self.__chips
 
