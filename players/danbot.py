@@ -7,7 +7,7 @@ class DanBot(PlayerBase):
     CARD_CHIP_VALUE_RATIO = .3
     CHIP_UTILITY_MODIFIER = 1
     MAX_LOW_CHIP_PENALTY = 20
-    EXTORT_UTILITY_BUFFER = 7
+    EXTORT_UTILITY_BUFFER = 7 # Maybe lower in games with competent opponents?
 
     def __init__(self, *args, **kwargs):
         # Must call super if you define your own constructor
