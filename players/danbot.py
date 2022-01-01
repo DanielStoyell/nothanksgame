@@ -7,7 +7,8 @@ class DanBot(PlayerBase):
     CARD_CHIP_VALUE_RATIO = .32
     CHIP_UTILITY_MODIFIER = 1
     MAX_LOW_CHIP_PENALTY = 13
-    EXTORT_UTILITY_BUFFER = 3.7
+    EXTORT_UTILITY_BUFFER = 3.2
+    SCREWED_BUFFER_WEIGHT = .5
 
     MAX_DECK_SIZE = 24
 
@@ -16,6 +17,8 @@ class DanBot(PlayerBase):
         super().__init__(*args, **kwargs)
 
         self.potential_deck = set(range(3, 36))
+        self.times_screwed = 0
+        self.currently_extorting = False
 
     def decide_impl(self, game):
         if self.get_chips() == 0:
@@ -52,15 +55,23 @@ class DanBot(PlayerBase):
             game.get_players()
         ) for i,p in enumerate(opponents) if p is not self]
 
-        if any([u - self.EXTORT_UTILITY_BUFFER < 0 for u in opponent_utilities]):
+        if any([u - self.get_extort_utility_buffer() < 0 for u in opponent_utilities]):
             return TAKE
 
+        self.currently_extorting = True
         return DECLINE
 
 
     def turn_update_impl(self, game, player, decision):
         if game.get_current_card() in self.potential_deck:
             self.potential_deck.remove(game.get_current_card())
+
+        if decision == TAKE:
+            if self.currently_extorting and player is not self:
+                self.times_screwed += 1
+
+            self.currently_extorting = False
+
 
     def get_ratio(self, game):
         return game.get_chips_on_card() / game.get_current_card()
@@ -161,6 +172,8 @@ class DanBot(PlayerBase):
 
     def mueller_investigation(self, game):
         colluders = [p for p in game.get_players() if (p is not self and self.NAME in p.get_name())]
+        if len(colluders) == 0:
+            return False
         non_colluders = [p for p in game.get_players() if (self.NAME not in p.get_name())]
         lowest_colluder_score = min([p.get_score() for p in colluders])
 
@@ -168,6 +181,8 @@ class DanBot(PlayerBase):
 
         return should_collude
 
+    def get_extort_utility_buffer(self):
+        return self.EXTORT_UTILITY_BUFFER * (1 + self.SCREWED_BUFFER_WEIGHT * self.times_screwed)
 
 
 def DanBotFactory():
