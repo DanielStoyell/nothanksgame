@@ -8,17 +8,7 @@ from players.dumboSally import DumboSally
 
 PLAYER_REGISTER = [
     DanBot,
-    DanBot,
-    DanBot,
-    DanBot,
     NoProbablemPlayer,
-    NoProbablemPlayer,
-    NoProbablemPlayer,
-    NoProbablemPlayer,
-    DumboSally,
-    DumboDan,
-    BasicPlayer,
-    DumboPlayer,
     DumboSally,
     DumboDan,
     BasicPlayer,

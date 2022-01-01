@@ -21,9 +21,11 @@ class DanBot(PlayerBase):
         self.currently_extorting = False
 
     def decide_impl(self, game):
+        # If no chips, have to take
         if self.get_chips() == 0:
             return TAKE
 
+        # If can collude to let friendly bot win, take infinitely
         # if self.mueller_investigation(game):
         #     return TAKE
 
@@ -37,29 +39,20 @@ class DanBot(PlayerBase):
             game.get_current_card(),
             game.get_players()
         )
+        # If taking the card would hurt me, decline
         if take_utility > 0:
             return DECLINE
 
-        players = game.get_players()
-        self_index = players.index(self)
-        opponents = (players[self_index:] + players[:self_index])[1:]
+        should_extort = self.get_should_extort(game.get_players(), game)
 
-        opponent_utilities = [self.take_card_utility(
-            p,
-            game.get_current_card(),
-            game.get_chips_on_card()+i+1,
-            p.get_cards(),
-            p.get_chips(),
-            game.get_deck_length(),
-            game.get_current_card(),
-            game.get_players()
-        ) for i,p in enumerate(opponents) if p is not self]
+        # If taking the card would help me but hurt others, extort
+        if should_extort:
+            self.currently_extorting = True
+            return DECLINE
 
-        if any([u - self.get_extort_utility_buffer() < 0 for u in opponent_utilities]):
-            return TAKE
+        # If taking the card would help me and can't extort, take
+        return TAKE
 
-        self.currently_extorting = True
-        return DECLINE
 
 
     def turn_update_impl(self, game, player, decision):
@@ -169,6 +162,24 @@ class DanBot(PlayerBase):
                 score += cards[i]
 
         return score
+
+    def get_should_extort(self, players, game):
+        self_index = players.index(self)
+        opponents = (players[self_index:] + players[:self_index])[1:]
+
+        opponent_utilities = [self.take_card_utility(
+            p,
+            game.get_current_card(),
+            game.get_chips_on_card()+i+1,
+            p.get_cards(),
+            p.get_chips(),
+            game.get_deck_length(),
+            game.get_current_card(),
+            game.get_players()
+        ) for i,p in enumerate(opponents) if p is not self]
+
+        return not any([u - self.get_extort_utility_buffer() < 0 for u in opponent_utilities])
+
 
     def mueller_investigation(self, game):
         colluders = [p for p in game.get_players() if (p is not self and self.NAME in p.get_name())]
