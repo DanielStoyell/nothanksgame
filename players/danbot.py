@@ -153,8 +153,7 @@ class DanBot(PlayerBase):
         return prob_card_in_deck * steal_modifier * self.GET_CARD_PROB_MODIFIER
 
     def get_score_for_cards(self, cards):
-        cards = cards.copy()
-        cards.sort()
+        cards = sorted(cards)
         score = 0
 
         for i in range(len(cards)):
