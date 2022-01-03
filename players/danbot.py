@@ -3,17 +3,30 @@ from player import *
 
 class DanBot(PlayerBase):
     NAME = "DanBot"
-    GET_CARD_PROB_MODIFIER = .8
-    CARD_CHIP_VALUE_RATIO = .32
-    CHIP_UTILITY_MODIFIER = 1
-    MAX_LOW_CHIP_PENALTY = 13
-    EXTORT_UTILITY_BUFFER = 3.2
-    SCREWED_BUFFER_WEIGHT = .5
+    HYPERPARAMS = {
+        # How much to additionally weight each "getting screwed" in adjusting the extort utility buffer
+        "screwed_buffer_weight": .5,
+        # Additional utility caution in estimations of card utility for other players while extorting
+        "extort_utility_buffer": 3.2,
+        # With exponential decay, the maximum utility penalty for low chips
+        "max_low_chip_penalty": 15,
+        # The fuzz factor on the utility of chips (this + proportion of deck left + low chip penalty)
+        "chip_utility_modifier": 1,
+        # The expected value a card will yield in chips when picked up
+        "card_chip_value_ratio": .32,
+        # The fuzz factor on the raw card probability computation
+        "get_card_prob_modifier": .75,
+    }
 
     MAX_DECK_SIZE = 24
 
     def __init__(self, *args, **kwargs):
-        # Must call super if you define your own constructor
+        if "hyperparams" in kwargs:
+            self.hyperparams = kwargs["hyperparams"]
+            del kwargs["hyperparams"]
+        else:
+            self.hyperparams = self.HYPERPARAMS
+
         super().__init__(*args, **kwargs)
 
         self.potential_deck = set(range(3, 36))
@@ -110,7 +123,7 @@ class DanBot(PlayerBase):
         if chips < 0:
             return 1000000
         # low chip penalty should scale with end of game
-        return (-chips) * (self.CHIP_UTILITY_MODIFIER + (deck_length / self.MAX_DECK_SIZE)) + (self.MAX_LOW_CHIP_PENALTY/(chips+1))
+        return (-chips) * (self.hyperparams["chip_utility_modifier"] + (deck_length / self.MAX_DECK_SIZE)) + (self.hyperparams["max_low_chip_penalty"]/(chips+1))
 
     def get_card_set_utility(self, player, cards, current_card, deck_length, players):
         wanted_cards = self.get_run_cards_for_player(cards, current_card)
@@ -127,7 +140,7 @@ class DanBot(PlayerBase):
     def get_card_utility(self, card, current_cards):
         new_cards = current_cards + [card]
         score_diff = self.get_score_for_cards(new_cards) - self.get_score_for_cards(current_cards)
-        chip_value = card * self.CARD_CHIP_VALUE_RATIO
+        chip_value = card * self.hyperparams["card_chip_value_ratio"]
 
         return score_diff - chip_value
 
@@ -150,7 +163,7 @@ class DanBot(PlayerBase):
         else:
             steal_modifier = 1
 
-        return prob_card_in_deck * steal_modifier * self.GET_CARD_PROB_MODIFIER
+        return prob_card_in_deck * steal_modifier * self.hyperparams["get_card_prob_modifier"]
 
     def get_score_for_cards(self, cards):
         cards = sorted(cards)
@@ -192,40 +205,18 @@ class DanBot(PlayerBase):
         return should_collude
 
     def get_extort_utility_buffer(self):
-        return self.EXTORT_UTILITY_BUFFER * (1 + self.SCREWED_BUFFER_WEIGHT * self.times_screwed)
+        return self.hyperparams["extort_utility_buffer"] * (1 + self.hyperparams["screwed_buffer_weight"] * self.times_screwed)
 
 
 def DanBotFactory():
-    get_card_prob_modifier = DanBot.GET_CARD_PROB_MODIFIER
-    card_chip_value_ratio = DanBot.CARD_CHIP_VALUE_RATIO
-    chip_utility_modifier = DanBot.CHIP_UTILITY_MODIFIER
-    max_low_chip_penalty = DanBot.MAX_LOW_CHIP_PENALTY
-    extort_utility_buffer = DanBot.EXTORT_UTILITY_BUFFER
+    hyperparams = DanBot.HYPERPARAMS.copy()
+    param, value = random.choice(list(hyperparams.items()))
 
-    which = random.choice([4,5])
-    if which == 1:
-        get_card_prob_modifier = round(random.gauss(DanBot.GET_CARD_PROB_MODIFIER, DanBot.GET_CARD_PROB_MODIFIER/2), 3)
-        name = f"DanBotVariant (get_card_prob_mod: {get_card_prob_modifier}) "
-    elif which == 2:
-        card_chip_value_ratio = round(random.gauss(DanBot.CARD_CHIP_VALUE_RATIO, DanBot.CARD_CHIP_VALUE_RATIO/2), 3)
-        name = f"DanBotVariant (card_chip_value_ratio: {card_chip_value_ratio}) "
-    elif which == 3:
-        chip_utility_modifier = round(random.gauss(DanBot.CHIP_UTILITY_MODIFIER, DanBot.CHIP_UTILITY_MODIFIER/2), 3)
-        name = f"DanBotVariant (chip_utility_modifier: {chip_utility_modifier}) "
-    elif which == 4:
-        max_low_chip_penalty = round(random.gauss(DanBot.MAX_LOW_CHIP_PENALTY, DanBot.MAX_LOW_CHIP_PENALTY/2), 3)
-        name = f"DanBotVariant (max_low_chip_penalty: {max_low_chip_penalty}) "
-    elif which == 5:
-        extort_utility_buffer = round(random.gauss(DanBot.EXTORT_UTILITY_BUFFER, DanBot.EXTORT_UTILITY_BUFFER/2), 3)
-        name = f"DanBotVariant (extort_utility_buffer: {extort_utility_buffer}) "
-
+    hyperparams[param] = round(random.gauss(value, value/3), 2)
+    name = f"DanBotVariant ({param}: {hyperparams[param]}) "
 
     class DanBotVariant(DanBot):
         NAME = name
-        GET_CARD_PROB_MODIFIER = get_card_prob_modifier
-        CARD_CHIP_VALUE_RATIO = card_chip_value_ratio
-        CHIP_UTILITY_MODIFIER = chip_utility_modifier
-        MAX_LOW_CHIP_PENALTY = max_low_chip_penalty
-        EXTORT_UTILITY_BUFFER = extort_utility_buffer
+        HYPERPARAMS = hyperparams
 
     return DanBotVariant

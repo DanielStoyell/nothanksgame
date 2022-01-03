@@ -14,14 +14,15 @@ from players.basic import *
 
 class Evolver(object):
     GAME_SIZE = 5
-    ROUNDS = 20000
-    LEARNING_RATE = 0.1
+    ROUNDS = 50000
+    LEARNING_RATE = 0.2
     POPULATION_SIZE = 6
     CULL_SIZE = 3
 
-    def __init__(self):
+    def __init__(self, PlayerClass=NoProbablemPlayer):
+        self.PlayerClass = PlayerClass
         self.population = [
-            self.mutate_hyperparams(NoProbablemPlayer.HYPERPARAMS)
+            self.mutate_hyperparams(PlayerClass.HYPERPARAMS)
             for _ in range(self.POPULATION_SIZE)
         ]
         self.victories = {i: 0 for i, _ in enumerate(self.population)}
@@ -34,10 +35,10 @@ class Evolver(object):
         }
 
     def optimize_individually(self):
-        params = dict(NoProbablemPlayer.HYPERPARAMS)
+        params = dict(self.PlayerClass.HYPERPARAMS)
         opt_params = dict(params)
         curr_wr = self.get_win_rate(params)
-        for h, v in NoProbablemPlayer.HYPERPARAMS.items():
+        for h, v in self.PlayerClass.HYPERPARAMS.items():
             print("\n\n\n===========================")
             print("Optimizing", h)
             start_wr = curr_wr
@@ -69,9 +70,9 @@ class Evolver(object):
     def get_win_rate(self, params):
         wins = 0
         for n in progressbar(range(self.ROUNDS)):
-            player = NoProbablemPlayer(hyperparams=params)
+            player = self.PlayerClass(hyperparams=params)
 
-            game = Game([player, DumboSally(), DanBot(), DanBot(), DumboDan()])
+            game = Game([player, DumboSally(), NoProbablemPlayer(), DanBot(), DanBot()])
             winners = game.play_game()
             if player in winners:
                 wins += 1
@@ -83,7 +84,7 @@ class Evolver(object):
             for n in range(self.ROUNDS):
                 players = {}
                 for i in random.sample(range(len(self.population)), 1):
-                    players[i] = NoProbablemPlayer(hyperparams=self.population[i])
+                    players[i] = self.PlayerClass(hyperparams=self.population[i])
 
                 game = Game(list(players.values()) + [BasicPlayer(), DanBot(), DanBot(), DumboDan()])
                 winners = game.play_game()
